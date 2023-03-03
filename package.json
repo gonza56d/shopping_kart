@@ -1,0 +1,13 @@
+{
+  "name": "shopping_kart",
+  "version": "1.0.0",
+  "description": "Shopping Kart with Node.js on Docker",
+  "author": "Gonza Garcia <gonza56d@gmail.com>",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.16.1"
+  }
+}
