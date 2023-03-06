@@ -1,32 +1,54 @@
 version: '3.8'
 
 volumes:
-  local_postgres_data: {}
-  app_data: {}
+  local_postgres_data:
+  app_data:
+  local_mongo_data:
+  local_rabbit_data:
 
 services:
 
   postgres:
     image: postgres:14.7
     volumes:
-      - ./local_postgres_data:/var/lib/postgresql/data
+      - local_postgres_data:/var/lib/postgresql/data
     env_file:
       - .env
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 3s
-      timeout: 30s
-      retries: 5
+    ports:
+      - 5432:5432
+
+  mongo:
+    image: mongo:6.0.4
+    volumes:
+      - local_mongo_data:/data/db
+    env_file:
+      - .env
+    ports:
+      - 27017:27017
+
+  redis:
+    image: redis:7.0.9
+    env_file:
+      - .env
+    ports:
+      - 6379:6379
+
+  rabbit:
+    image: rabbitmq:3.10.19
+    volumes:
+      - local_rabbit_data:/data/rabbit
 
   api:
     build: .
     volumes:
-      - ./app_data:/app_data/
+      - app_data:/app_data/
     command: node server.js
     env_file:
       - .env
     ports:
       - 8080:8080
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
+      - mongo
+      - redis
+      - rabbit
